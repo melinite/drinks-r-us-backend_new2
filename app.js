@@ -73,7 +73,7 @@ app.get('/api/users/', (req, res) => {
 });
 
 // API get target user
-app.get('/api/users/:id', (req, res) => {
+app.get('/api/users/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
 
     let id = req.params.id;
 
@@ -83,12 +83,12 @@ app.get('/api/users/:id', (req, res) => {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify(results));
         } else {
-            res.status(434).send('User does not exist is DB');
+            res.status(404).send('User does not exist is DB');
         }
 
     }).catch((e) => {
         console.log(e);
-        res.status(434).send('error retrieving info on target User');
+        res.status(500).send('error retrieving info on target User');
     })
 
 });
@@ -131,7 +131,7 @@ app.post('/api/users/register', (req, res) => {
 });
 
 // API update a target user's info
-app.put('/api/users/:id', function (req, res) {
+app.put('/api/users/:id', passport.authenticate('jwt', { session: false }), function (req, res) {
 
     const data = {
 
