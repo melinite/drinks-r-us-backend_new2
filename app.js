@@ -3,7 +3,7 @@ require('dotenv').config();
 const config = {
 
     host: process.env.DB_HOST,
-    port: 5432,
+    port: process.env.DB_PORT || 5432,
     database: process.env.DB_NAME,
     username: process.env.DB_USER,
     password: process.env.DB_PASS,
@@ -14,6 +14,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const passport = require('passport');
 
 
 const Sequelize = require('sequelize');
@@ -21,6 +22,9 @@ const UserModel = require('./database/models/user');
 const ProductModel = require('./database/models/product');
 const OrderModel = require('./database/models/order');
 const OrderProductModel = require('./database/models/order_product');
+
+// load passport configuration middleware
+const { passportLoginRoute, passportJWTStrategy } = require('./middleware/passport-config');
 
 const connectionString = `postgres://${config.username}:${config.password}@${config.host}:${config.port}/${config.database}`
 const sequelize = new Sequelize(process.env.DATABASE_URL || connectionString, {
@@ -48,6 +52,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 app.use(express.static('public'));
+
+// init passport with passportJWTStrategy
+passportJWTStrategy({ passport, Users });
+// add login route
+passportLoginRoute({ app, Users });
+
 
 // API get all users
 app.get('/api/users/', (req, res) => {
@@ -475,7 +485,7 @@ app.post('/api/orders/register', function (req, res) {
             res.end(JSON.stringify(order));
 
         }).catch((e) => {
-            
+
             console.log(e);
             res.status(434).send('error registering Order');
 
@@ -668,5 +678,6 @@ app.get('/api/order-products/user/:id', (req, res) => {
 
 });
 
-app.listen(3001);
-console.log('Drinks-R-Us API is running');
+
+const port = process.env.PORT || 3001;
+app.listen(port, () => { console.log(`Drinks-R-Us API is running. app listening on port ${port}`); });
