@@ -33,9 +33,9 @@ const passportJWTStrategy = ({ passport, Users }) => {
                 const authenticatedUser = await Users.findByPk(payload.id);
                 if (authenticatedUser) {
                     return done(null, {
-                        id: user.id,
-                        name: user.name,
-                        email: user.email,
+                        id: authenticatedUser.id,
+                        name: authenticatedUser.name,
+                        email: authenticatedUser.email,
                     });
                 }
                 // no valid user found
@@ -74,7 +74,7 @@ const passportLoginRoute = ({ app, Users }) => {
                     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: 36000 });
                     return res.json({
                         success: true,
-                        token: `Bearer ${token}`
+                        token
                     });
                 } catch (err) {
                     return res.status(500)
