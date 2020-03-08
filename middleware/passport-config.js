@@ -67,7 +67,8 @@ const passportLoginRoute = ({ app, Users }) => {
             if (bcrypt.compareSync(password, attemptedUser.password)) {
                 const payload = {
                     id: attemptedUser.id,
-                    email: attemptedUser.email
+                    email: attemptedUser.email,
+                    isAdmin: attemptedUser.admini
                 };
                 // sign the token
                 try {
